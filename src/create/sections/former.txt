@@ -1,0 +1,295 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
+import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { HeadingNode, QuoteNode } from "@lexical/rich-text";
+import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
+import { ListItemNode, ListNode } from "@lexical/list";
+import { CodeHighlightNode, CodeNode } from "@lexical/code";
+import { AutoLinkNode, LinkNode } from "@lexical/link";
+import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
+import { TRANSFORMERS } from "@lexical/markdown";
+import { AutoLinkPlugin } from "@lexical/react/LexicalAutoLinkPlugin";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import {
+  $getRoot,
+  $createParagraphNode,
+  $createTextNode,
+  EditorState,
+} from "lexical";
+
+import { Button, Card } from "@/components/ui";
+import {
+  FiBold,
+  FiItalic,
+  FiList,
+  FiLink,
+  FiCode,
+  FiAlignLeft,
+  FiAlignCenter,
+  FiAlignRight,
+} from "react-icons/fi";
+import BasicInfoSettings from "./basic-info";
+
+function Placeholder() {
+  return (
+    <div className="absolute left-[1.125rem] top-[1.125rem] text-gray-400">
+      Enter your blog content here...
+    </div>
+  );
+}
+
+function ToolbarPlugin() {
+  const [editor] = useLexicalComposerContext();
+
+  const formatText = (format: string) => {
+    editor.dispatchCommand(format, undefined);
+  };
+
+  const formatAlign = (alignment: string) => {
+    editor.dispatchCommand(alignment, undefined);
+  };
+
+  const insertLink = () => {
+    const url = prompt("Enter the URL:");
+    if (url) {
+      editor.dispatchCommand("INSERT_LINK", url);
+    }
+  };
+
+  return (
+    <div className="flex flex-wrap gap-2 bg-gray-100 p-2">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => formatText("FORMAT_TEXT_COMMAND")}
+      >
+        <FiBold />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => formatText("FORMAT_TEXT_COMMAND")}
+      >
+        <FiItalic />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => formatText("INSERT_UNORDERED_LIST_COMMAND")}
+      >
+        <FiList />
+      </Button>
+      <Button variant="ghost" size="sm" onClick={insertLink}>
+        <FiLink />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => formatText("FORMAT_ELEMENT_COMMAND")}
+      >
+        <FiCode />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => formatAlign("FORMAT_ELEMENT_COMMAND")}
+      >
+        <FiAlignLeft />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => formatAlign("FORMAT_ELEMENT_COMMAND")}
+      >
+        <FiAlignCenter />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => formatAlign("FORMAT_ELEMENT_COMMAND")}
+      >
+        <FiAlignRight />
+      </Button>
+    </div>
+  );
+}
+
+function onError(error: Error) {
+  console.log(error);
+}
+
+const CreateBlogPost = () => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const [featuredImage, setFeaturedImage] = useState("");
+  const [isPreview, setIsPreview] = useState(false);
+  const [editorState] = useState<EditorState | null>(null);
+
+  const initialConfig = {
+    namespace: "MyEditor",
+    theme: {
+      ltr: "ltr",
+      rtl: "rtl",
+      placeholder: "editor-placeholder",
+      paragraph: "editor-paragraph",
+      quote: "editor-quote",
+      heading: {
+        h1: "editor-heading-h1",
+        h2: "editor-heading-h2",
+        h3: "editor-heading-h3",
+        h4: "editor-heading-h4",
+        h5: "editor-heading-h5",
+      },
+      list: {
+        nested: {
+          listitem: "editor-nested-listitem",
+        },
+        ol: "editor-list-ol",
+        ul: "editor-list-ul",
+        listitem: "editor-listitem",
+      },
+      image: "editor-image",
+      link: "editor-link",
+      text: {
+        bold: "editor-text-bold",
+        italic: "editor-text-italic",
+        overflowed: "editor-text-overflowed",
+        hashtag: "editor-text-hashtag",
+        underline: "editor-text-underline",
+        strikethrough: "editor-text-strikethrough",
+        underlineStrikethrough: "editor-text-underlineStrikethrough",
+        code: "editor-text-code",
+      },
+      code: "editor-code",
+      codeHighlight: {
+        atrule: "editor-tokenAttr",
+        attr: "editor-tokenAttr",
+        boolean: "editor-tokenProperty",
+        builtin: "editor-tokenSelector",
+        cdata: "editor-tokenComment",
+        char: "editor-tokenSelector",
+        class: "editor-tokenFunction",
+        "class-name": "editor-tokenFunction",
+        comment: "editor-tokenComment",
+        constant: "editor-tokenProperty",
+        deleted: "editor-tokenProperty",
+        doctype: "editor-tokenComment",
+        entity: "editor-tokenOperator",
+        function: "editor-tokenFunction",
+        important: "editor-tokenVariable",
+        inserted: "editor-tokenSelector",
+        keyword: "editor-tokenAttr",
+        namespace: "editor-tokenVariable",
+        number: "editor-tokenProperty",
+        operator: "editor-tokenOperator",
+        prolog: "editor-tokenComment",
+        property: "editor-tokenProperty",
+        punctuation: "editor-tokenPunctuation",
+        regex: "editor-tokenVariable",
+        selector: "editor-tokenSelector",
+        string: "editor-tokenSelector",
+        symbol: "editor-tokenProperty",
+        tag: "editor-tokenProperty",
+        url: "editor-tokenOperator",
+        variable: "editor-tokenVariable",
+      },
+    },
+    onError,
+    nodes: [
+      HeadingNode,
+      ListNode,
+      ListItemNode,
+      QuoteNode,
+      CodeNode,
+      CodeHighlightNode,
+      TableNode,
+      TableCellNode,
+      TableRowNode,
+      AutoLinkNode,
+      LinkNode,
+    ],
+  };
+
+  const handleAddTag = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && tagInput.trim()) {
+      e.preventDefault();
+      setTags([...tags, tagInput.trim()]);
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFeaturedImage(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async () => {
+    const blogPost = {
+      title,
+      description,
+      content: JSON.stringify(editorState),
+      tags,
+      featuredImage,
+      meta: {
+        title,
+        description,
+        keywords: tags.join(", "),
+      },
+    };
+    console.log("Saving blog post:", blogPost);
+    // Implement your save logic here
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
+        <div className="mx-auto max-w-5xl">
+          <BasicInfoSettings />
+
+          <Card>
+            <div className="overflow-hidden rounded-lg border">
+              <LexicalComposer initialConfig={initialConfig}>
+                <div className="relative">
+                  <div className="h-[5rem]">
+                    {!isPreview && <ToolbarPlugin />}
+                  </div>
+                  <RichTextPlugin
+                    contentEditable={
+                      <ContentEditable className="min-h-[400px] p-4 outline-none" />
+                    }
+                    placeholder={<Placeholder />}
+                    ErrorBoundary={LexicalErrorBoundary}
+                  />
+                  <HistoryPlugin />
+                  <AutoFocusPlugin />
+                  <ListPlugin />
+                  <LinkPlugin />
+                  <AutoLinkPlugin />
+                  <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+                </div>
+              </LexicalComposer>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CreateBlogPost;

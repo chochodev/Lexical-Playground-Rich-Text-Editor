@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  plugins: [react(), dts()],
+  plugins: [react(), dts(), tailwindcss(),],
   build: {
     lib: {
       entry: 'src/index.ts',
@@ -19,6 +20,11 @@ export default defineConfig({
           'react-dom': 'ReactDOM'
         }
       }
+    }
+  },
+  resolve: {
+    alias: {
+      "@": "/src"
     }
   }
 });
