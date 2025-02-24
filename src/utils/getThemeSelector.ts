@@ -7,7 +7,7 @@
  */
 
 import {EditorThemeClasses} from 'lexical';
-import invariant from '@/shared/src/invariant';
+import invariant from '../../shared/src/invariant';
 
 export function getThemeSelector(
   getTheme: () => EditorThemeClasses | null | undefined,

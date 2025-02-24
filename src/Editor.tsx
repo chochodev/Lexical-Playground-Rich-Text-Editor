@@ -28,7 +28,7 @@ import {TablePlugin} from '@lexical/react/LexicalTablePlugin';
 import {useLexicalEditable} from '@lexical/react/useLexicalEditable';
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import {CAN_USE_DOM} from '@/shared/src/canUseDOM';
+import {CAN_USE_DOM} from '../shared/src/canUseDOM';
 
 import {createWebsocketProvider} from './collaboration';
 import {useSettings} from './context/SettingsContext';

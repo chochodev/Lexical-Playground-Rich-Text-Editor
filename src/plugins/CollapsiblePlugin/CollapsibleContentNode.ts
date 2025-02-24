@@ -16,8 +16,8 @@ import {
   LexicalNode,
   SerializedElementNode,
 } from 'lexical';
-import {IS_CHROME} from '@/shared/src/environment';
-import invariant from '@/shared/src/invariant';
+import {IS_CHROME} from '../../../shared/src/environment';
+import invariant from '../../../shared/src/invariant';
 
 import {$isCollapsibleContainerNode} from './CollapsibleContainerNode';
 import {domOnBeforeMatch, setDomHiddenUntilFound} from './CollapsibleUtils';

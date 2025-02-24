@@ -18,7 +18,7 @@ import {
 } from '@lexical/table';
 import {EditorThemeClasses, Klass, LexicalEditor, LexicalNode} from 'lexical';
 import {createContext, useContext, useEffect, useMemo, useState} from 'react';
-import invariant from '@/shared/src/invariant';
+import invariant from '../../shared/src/invariant';
 
 import Button from '../ui/Button';
 import {DialogActions} from '../ui/Dialog';

@@ -92,7 +92,8 @@ export default defineConfig(({command}) => {
       alias: {
         ...moduleResolution(command === 'serve' ? 'source' : 'development'),
         "/*": "./*",
-        "@/*": ["./*"]
+        "@/*": ["./*"],
+        "@/shared/*": ["shared/*"]
       }
     },
   };

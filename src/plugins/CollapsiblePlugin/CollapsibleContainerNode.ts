@@ -19,8 +19,8 @@ import {
   SerializedElementNode,
   Spread,
 } from 'lexical';
-import {IS_CHROME} from '@/shared/src/environment';
-import invariant from '@/shared/src/invariant';
+import {IS_CHROME} from '../../../shared/src/environment';
+import invariant from '../../../shared/src/invariant';
 
 import {setDomHiddenUntilFound} from './CollapsibleUtils';
 

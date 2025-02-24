@@ -29,7 +29,7 @@ function getErrorMap(filepath) {
   let errorMap = errorMaps.get(filepath);
   if (!errorMap) {
     const prettierConfig = {
-      ...(prettier.resolveConfig.sync('./') || {}),
+      ...(prettier.resolveConfig('./') || {}),
       filepath,
     };
     errorMap = new ErrorMap(fs.readJsonSync(filepath), (newErrorMap) =>

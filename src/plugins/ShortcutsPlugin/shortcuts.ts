@@ -6,7 +6,7 @@
  *
  */
 
-import {IS_APPLE} from '@/shared/src/environment';
+import {IS_APPLE} from '../../../shared/src/environment';
 
 //disable eslint sorting rule for quick reference to shortcuts
 /* eslint-disable sort-keys-fix/sort-keys-fix */

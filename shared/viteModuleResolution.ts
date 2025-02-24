@@ -35,11 +35,11 @@ const sourceModuleResolution = () => {
       .flatMap((pkg) =>
         pkg.getExportedNpmModuleEntries().map(toAlias.bind(null, pkg)),
       ),
-    ...['shared']
-      .map((name) => packagesManager.getPackageByDirectoryName(name))
-      .flatMap((pkg) =>
-        pkg.getPrivateModuleEntries().map(toAlias.bind(null, pkg)),
-      ),
+    // ...['shared']
+    //   .map((name) => packagesManager.getPackageByDirectoryName(name))
+    //   .flatMap((pkg) =>
+    //     pkg.getPrivateModuleEntries().map(toAlias.bind(null, pkg)),
+    //   ),
   ];
 };
 
@@ -68,15 +68,15 @@ const distModuleResolution = (environment: 'development' | 'production') => {
           };
         }),
     ),
-    ...[packagesManager.getPackageByDirectoryName('shared')].flatMap(
-      (pkg: PackageMetadata) =>
-        pkg.getPrivateModuleEntries().map((entry: ModuleExportEntry) => {
-          return {
-            find: entry.name,
-            replacement: pkg.resolve('src', entry.sourceFileName),
-          };
-        }),
-    ),
+    // ...[packagesManager.getPackageByDirectoryName('shared')].flatMap(
+    //   (pkg: PackageMetadata) =>
+    //     pkg.getPrivateModuleEntries().map((entry: ModuleExportEntry) => {
+    //       return {
+    //         find: entry.name,
+    //         replacement: pkg.resolve('src', entry.sourceFileName),
+    //       };
+    //     }),
+    // ),
   ];
 };
 
