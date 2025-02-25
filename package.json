@@ -1,17 +1,33 @@
 {
   "name": "chocho-lexicaleditor",
-  "version": "0.0.2",
-  "main": "./dist/chocho-lexicaleditor.umd.js",
-  "module": "./dist/chocho-lexicaleditor.es.js",
-  "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "version": "0.0.5",
+  "exports": {
+    "types": "./dist/types/index.d.ts",
+    "import": "./dist/chocho-lexicaleditor.js",
+    "require": "./dist/chocho-lexicaleditor.cjs",
+    "default": "./dist/chocho-lexicaleditor.js"
+  },
+  "main": "./dist/chocho-lexicaleditor.cjs",
+  "module": "./dist/chocho-lexicaleditor.js",
+  "style": "./dist/chocho-lexicaleditor.css",
+  "files": [
+    "dist"
+  ],
   "type": "module",
-  
-  "keywords": ["react", "chocho", "editor", "text editor", "npm", "lexical"],
   "author": "Michael Emmanuel",
   "license": "MIT",
-  "description": "A text editor using lexical library",
-
+  "description": "A rich text editor using lexical library",
+  "keywords": [
+    "react",
+    "chocho",
+    "editor",
+    "text editor",
+    "npm",
+    "lexical"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

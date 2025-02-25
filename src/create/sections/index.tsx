@@ -22,7 +22,7 @@ import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import Toolbar from './components/toolbar';
 import { theme } from './components/theme';
 
-interface EditorProps {
+export interface EditorProps {
   initialConfig?: any;
   onChange?: (editorState: any) => void;
 }

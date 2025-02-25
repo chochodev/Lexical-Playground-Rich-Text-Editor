@@ -11,7 +11,7 @@
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "noEmit": true,
+    "noEmit": false,
 
     /* Linting */
     "strict": false,
@@ -21,7 +21,13 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    
+    "declaration": true, // Generate .d.ts files
+    "declarationDir": "./dist/types", // Output directory for .d.ts files
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+    "outDir": "./dist", // Output directory for compiled JS files
+    "esModuleInterop": true,
+        
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
