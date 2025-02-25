@@ -7,16 +7,32 @@ export default defineConfig({
   build: {
     lib: {
       entry: 'src/index.ts',
-      name: 'ChochoLexicalEditor',
-      fileName: 'index',
+      name: "chocho-lexicaleditor",
+      fileName: "chocho-lexicaleditor",
       formats: ['es', 'cjs']
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'lexical', '@lexical/react'],
+      external: [
+        'react', 
+        'react-dom', 
+        'lexical', 
+        '@lexical/react', 
+        "@heroui/react",
+        "framer-motion",
+        "react-icons",
+        "zod",
+        "zustand",],
       output: {
         globals: {
-          react: 'React',
-          'react-dom': 'ReactDOM'
+          react: "React",
+          "react-dom": "ReactDOM",
+          "@heroui/react": "HeroUI",
+          lexical: "Lexical",
+          "@lexical/react": "LexicalReact",
+          "framer-motion": "FramerMotion",
+          "react-icons": "ReactIcons",
+          zod: "Zod",
+          zustand: "Zustand",
         }
       }
     }

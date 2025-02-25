@@ -1,30 +1,41 @@
 {
-  "name": "lexical-main",
-  "private": true,
-  "version": "0.0.0",
+  "name": "chocho-lexicaleditor",
+  "version": "0.0.2",
+  "main": "./dist/chocho-lexicaleditor.umd.js",
+  "module": "./dist/chocho-lexicaleditor.es.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
   "type": "module",
+  
+  "keywords": ["react", "chocho", "editor", "text editor", "npm", "lexical"],
+  "author": "Michael Emmanuel",
+  "license": "MIT",
+  "description": "A text editor using lexical library",
+
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@heroui/react": "^2.6.14"
   },
   "dependencies": {
-    "@heroui/react": "^2.7.2",
     "@lexical/react": "^0.25.0",
-    "@tailwindcss/vite": "^4.0.8",
     "framer-motion": "^12.4.7",
     "lexical": "^0.25.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
     "zod": "^3.24.2",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.19.0",
     "eslint-plugin-react-hooks": "^5.0.0",
@@ -32,7 +43,6 @@
     "globals": "^15.14.0",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.7.2",
-    "typescript-eslint": "^8.22.0",
     "vite": "^6.1.0",
     "vite-plugin-dts": "^4.5.0"
   }

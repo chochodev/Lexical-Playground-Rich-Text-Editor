@@ -4,7 +4,7 @@ import './index.css';
 import { useAlertStore } from '@/store';
 import Alert from '@/components/alert';
 
-function App() {
+export function App() {
   const { alert } = useAlertStore();
   return (
     <HeroUIProvider>
