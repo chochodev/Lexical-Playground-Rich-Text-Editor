@@ -2,8 +2,9 @@ import Editor from './sections';
 import { HeroUIProvider } from '@heroui/react';
 import { useAlertStore } from '@/store';
 import Alert from '@/components/alert';
+import './index.css';
 
-function App() {
+function CreateEditor() {
   const { alert } = useAlertStore();
   return (
     <HeroUIProvider>
@@ -13,4 +14,4 @@ function App() {
   );
 }
 
-export default App;
+export default CreateEditor;
