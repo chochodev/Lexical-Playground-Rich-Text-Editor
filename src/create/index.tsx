@@ -1,9 +1,16 @@
 import Editor from './sections';
+import { HeroUIProvider } from '@heroui/react';
+import { useAlertStore } from '@/store';
+import Alert from '@/components/alert';
 
-const EditorPage = () => {
+function App() {
+  const { alert } = useAlertStore();
   return (
-    <Editor />
-  )
+    <HeroUIProvider>
+      {alert.isOpen && <Alert />}
+      <Editor />
+    </HeroUIProvider>
+  );
 }
 
-export default EditorPage;
+export default App;

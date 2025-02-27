@@ -9,6 +9,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
-  }
+    },
+    "typeRoots": ["./node_modules/@types", "dist/types"]
+  },
+  
+  "exclude": ["node_modules", "dist"]
 }

@@ -3,7 +3,13 @@ import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 
 export default defineConfig({
-  plugins: [react(), dts({ insertTypesEntry: true }),],
+  plugins: [
+    react(),
+    dts({
+      insertTypesEntry: true,
+      outDir: 'dist/types',
+    }),
+  ],
   build: {
     lib: {
       entry: 'src/index.ts',
@@ -13,15 +19,16 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
-        'react', 
-        'react-dom', 
-        'lexical', 
-        '@lexical/react', 
+        'react',
+        'react-dom',
+        'lexical',
+        '@lexical/react',
         "@heroui/react",
         "framer-motion",
         "react-icons",
         "zod",
-        "zustand",],
+        "zustand",
+      ],
       output: {
         globals: {
           react: "React",

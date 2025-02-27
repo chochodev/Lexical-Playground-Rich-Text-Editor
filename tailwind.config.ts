@@ -1,5 +1,3 @@
-
-// tailwind.config.js
 import { heroui } from "@heroui/react";
 import { Config } from 'tailwindcss'
 
