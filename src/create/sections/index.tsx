@@ -9,7 +9,6 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
-// import { $getRoot } from "lexical";/
 
 // Import necessary nodes
 import { ListNode, ListItemNode } from '@lexical/list';
@@ -61,7 +60,7 @@ const Editor = ({ initialConfig = defaultConfig, onChange }: EditorProps) => {
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <div className="editor-container mx-auto my-4 w-full max-w-5xl">
-        <div className="rounded-md border border-solid border-gray-200 p-4">
+        <div className="rounded-md border border-solid border-gray-200 p-2 sm:p-4">
           <Toolbar />
           <div className="editor-wrapper relative p-4">
             <RichTextPlugin

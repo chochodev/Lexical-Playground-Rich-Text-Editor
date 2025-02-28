@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getSelection,
@@ -12,11 +12,10 @@ import {
 } from "lexical";
 import {
   INSERT_UNORDERED_LIST_COMMAND,
-  // INSERT_ORDERED_LIST_COMMAND,
+  INSERT_ORDERED_LIST_COMMAND,
 } from "@lexical/list";
 import {
   FiItalic,
-  FiList,
   FiLink,
   FiCode,
   FiAlignLeft,
@@ -25,13 +24,12 @@ import {
   FiRotateCcw,
   FiRotateCw,
 } from "react-icons/fi";
-import { LuPencilLine, LuBold } from "react-icons/lu";
+import { LuPencilLine, LuBold, LuList, LuListOrdered } from "react-icons/lu";
 import { TextFormatType, ElementFormatType, LexicalCommand } from "lexical";
-import { TOGGLE_LINK_COMMAND, $isLinkNode } from "@lexical/link";
 import { Button, Separator } from "../tool-button";
 import LinkModal from "../link-modal";
-import { useAlertStore } from "@/store";
-import { z } from "zod";
+import { useToolbarStore } from "@/store";
+import { useLinkHook } from '@/hooks';
 
 type ToolbarAction = {
   icon: React.ReactNode;
@@ -67,10 +65,16 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
     label: "Align Right",
   },
   {
-    icon: <FiList />,
+    icon: <LuList />,
     command: INSERT_UNORDERED_LIST_COMMAND,
     type: "list",
     label: "Bullet List",
+  },
+  {
+    icon: <LuListOrdered />,
+    command: INSERT_ORDERED_LIST_COMMAND,
+    type: "list",
+    label: "Numbered List",
   },
   {
     icon: <FiLink />,
@@ -82,9 +86,8 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
 
 const Toolbar = () => {
   const [editor] = useLexicalComposerContext();
-  const [showModal, setShowModal] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
-  const { setAlert } = useAlertStore();
+  const { setShowInsertLinkModal } = useToolbarStore();
   const [hoveredLink, setHoveredLink] = useState<{
     url: string;
     x: number;
@@ -99,7 +102,7 @@ const Toolbar = () => {
     type: ToolbarAction["type"],
   ) => {
     if (type === "custom" && command === "insertLink") {
-      setShowModal(true);
+      setShowInsertLinkModal(true);
       return;
     }
 
@@ -126,106 +129,15 @@ const Toolbar = () => {
     });
   };
 
-  useEffect(() => {
-    const unregisterListener = editor.registerUpdateListener(
-      ({ editorState }) => {
-        editorState.read(() => {
-          const selection = $getSelection();
-
-          if (!$isRangeSelection(selection)) {
-            setHoveredLink(null);
-            return;
-          }
-
-          const anchorNode = selection.anchor.getNode();
-          const focusNode = selection.focus.getNode();
-
-          const linkNode = $isLinkNode(anchorNode)
-            ? anchorNode
-            : $isLinkNode(anchorNode.getParent())
-              ? anchorNode.getParent()
-              : $isLinkNode(focusNode)
-                ? focusNode
-                : $isLinkNode(focusNode.getParent())
-                  ? focusNode.getParent()
-                  : null;
-
-          if (linkNode && $isLinkNode(linkNode)) {
-            const url = linkNode.getURL();
-            const domNode = editor.getElementByKey(linkNode.getKey());
-
-            if (domNode) {
-              const rect = domNode.getBoundingClientRect();
-              setHoveredLink({
-                url,
-                x: rect.left + window.scrollX,
-                y: rect.top + window.scrollY,
-              });
-            }
-          } else {
-            setHoveredLink(null);
-          }
-        });
-      },
-    );
-
-    return () => unregisterListener();
-  }, [editor]);
-
-  // :::::::::::::::::::::::: Function: Insert Link
-  const insertLink = (link: string) => {
-    const urlSchema = z.string().url();
-
-    // :::::::::::::::::::::: Validates URL
-    const result = urlSchema.safeParse(link);
-    if (!result.success) {
-      setAlert({
-        title: "Invalid URL",
-        message: "Please enter a valid URL (usually starts with `https://`).",
-        type: "warning",
-      });
-      return;
-    }
-
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        const anchorNode = selection.anchor.getNode();
-        const focusNode = selection.focus.getNode();
-
-        // Ensure we're only modifying one node at a time
-        if (anchorNode === focusNode) {
-          editor.dispatchCommand(TOGGLE_LINK_COMMAND, link);
-        }
-      }
-    });
-
-    setShowModal(false);
-    setLinkUrl("");
-  };
-
-  // :::::::::::::::::::::::: Function: Unlink Text
-  const unlinkText = () => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        const nodes = selection.getNodes();
-        nodes.forEach((node) => {
-          const linkNode = $isLinkNode(node) ? node : node.getParent();
-  
-          if (linkNode && $isLinkNode(linkNode)) {
-            const children = linkNode.getChildren();
-            children.forEach((child) => linkNode.insertBefore(child));
-            linkNode.remove(); 
-            setShowModal(false);
-          }
-        });
-      }
-    });
-  };
+  // :::::::::::::::::::::: Hook: Manipulate Links (Insert, Unlink, Edit)
+  const { insertLink, unlinkText } = useLinkHook({
+    editor,
+    setHoveredLink,
+    setLinkUrl,
+  });
 
   return (
-    <div className="relative flex flex-wrap gap-2 bg-gray-100 p-2">
+    <div className="relative flex flex-wrap gap-2 rounded-md bg-gray-100 p-2">
       {TOOLBAR_ACTIONS.map(({ icon, command, type, label }, index) => (
         <div key={index} className="relative">
           <Button
@@ -263,7 +175,7 @@ const Toolbar = () => {
           }}
           onClick={() => {
             setLinkUrl(hoveredLink.url);
-            setShowModal(true);
+            setShowInsertLinkModal(true);
           }}
         >
           <LuPencilLine className="text-[1rem]" />
@@ -273,8 +185,6 @@ const Toolbar = () => {
       <LinkModal
         linkUrl={linkUrl}
         insertLink={insertLink}
-        showModal={showModal}
-        setShowModal={setShowModal}
         unlinkText={unlinkText}
       />
     </div>

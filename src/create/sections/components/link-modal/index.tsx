@@ -9,21 +9,21 @@ import {
   Input,
 } from "@heroui/react";
 import { LuTrash2, LuLink } from "react-icons/lu";
+import { useToolbarStore } from '@/store';
 
 export default function LinkModal({
   linkUrl,
-  showModal,
   insertLink,
-  setShowModal,
   unlinkText,
 }) {
+  const { showInsertLinkModal, setShowInsertLinkModal } = useToolbarStore();
   const [link, setLink] = useState(linkUrl);
 
   useEffect(() => {
-    if (showModal) {
+    if (showInsertLinkModal) {
       setLink(linkUrl);
     }
-  }, [showModal, linkUrl]);
+  }, [showInsertLinkModal, linkUrl]);
   
   const handleInsertLink = (e: any) => {
     e.preventDefault();
@@ -31,14 +31,14 @@ export default function LinkModal({
     if (link) {
       insertLink(link);
     }
-    setShowModal(false);
+    setShowInsertLinkModal(false);
   };
 
   return (
     <Modal
-      isOpen={showModal}
+      isOpen={showInsertLinkModal}
       placement="top-center"
-      onOpenChange={setShowModal}
+      onOpenChange={setShowInsertLinkModal}
     >
       <ModalContent>
         <form onSubmit={handleInsertLink}>
@@ -70,7 +70,7 @@ export default function LinkModal({
             </Button>
             <Button
               size="sm"
-              className="rounded-sm bg-neutral-800 text-neutral-200"
+              className="rounded-md bg-neutral-800 text-neutral-200"
               onPress={handleInsertLink}
               type="submit"
             >
