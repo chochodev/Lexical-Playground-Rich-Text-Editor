@@ -13,7 +13,7 @@ const useLinkHook = ({
   setLinkUrl
 }) => {
   const { setAlert } = useAlertStore();
-  const { showInsertLinkModal, setShowInsertLinkModal, } = useToolbarStore();
+  const { setShowInsertLinkModal, } = useToolbarStore();
 
   useEffect(() => {
     const unregisterListener = editor.registerUpdateListener(

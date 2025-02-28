@@ -168,7 +168,7 @@ const Toolbar = () => {
       {hoveredLink && (
         <button
           ref={buttonRef}
-          className="ease-300 fixed z-[50] rounded-sm border border-solid border-neutral-300 bg-neutral-200 px-2 py-1.5 text-neutral-500 shadow-md hover:text-neutral-700 active:scale-95"
+          className="ease-300 fixed z-[50] rounded-md border border-solid border-neutral-200 bg-neutral-100 px-1.5 py-1 text-neutral-500 shadow-md hover:text-neutral-700 active:scale-95"
           style={{
             top: hoveredLink.y + 20,
             left: hoveredLink.x,
@@ -178,7 +178,7 @@ const Toolbar = () => {
             setShowInsertLinkModal(true);
           }}
         >
-          <LuPencilLine className="text-[1rem]" />
+          <LuPencilLine className="text-[0.875rem]" />
         </button>
       )}
       {/* :::::::::::::::::: Link Modal */}
