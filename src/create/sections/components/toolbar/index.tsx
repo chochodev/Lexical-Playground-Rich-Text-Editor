@@ -41,6 +41,8 @@ import { Button, Separator } from '../tool-button';
 import LinkModal from '../link-modal';
 import { useToolbarStore } from '@/store';
 import { useLinkHook } from '@/hooks';
+import { LexicalEditor } from 'lexical';
+import { updateFontSizeInSelection } from './utils';
 
 type ToolbarAction = {
   icon: React.ReactNode;
@@ -154,27 +156,25 @@ const Toolbar = () => {
     editor.update(() => {
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
-  
-      const anchorNode = selection.anchor.getNode();
-      const focusNode = selection.focus.getNode();
-  
-      // Collect all text nodes within the selection
-      const selectedNodes = selection.getNodes().filter($isTextNode) as TextNode[];
-  
+
+      const selectedNodes = selection
+        .getNodes()
+        .filter($isTextNode) as TextNode[];
       if (selectedNodes.length === 0) return;
-  
+
       selectedNodes.forEach((textNode) => {
-        // Get current style
+        // Extract current font size
         let style = textNode.getStyle();
         let match = style.match(/font-size:\s*(\d+)px/);
         let currentSize = match ? parseInt(match[1]) : 16; // Default to 16px
-  
-        // Calculate new font size
-        let newSize = increment ? currentSize + 2 : Math.max(10, currentSize - 2);
-  
-        // Remove existing font-size declaration before setting a new one
-        style = style.replace(/font-size:\s*\d+px;?/g, '').trim();
-        textNode.setStyle(`font-size: ${newSize}px; ${style}`);
+
+        // Calculate new size
+        let newSize = increment
+          ? currentSize + 2
+          : Math.max(10, currentSize - 2);
+
+        // Use Lexical utility function to update selection
+        updateFontSizeInSelection(editor, `${newSize}px`, null);
       });
     });
   };
