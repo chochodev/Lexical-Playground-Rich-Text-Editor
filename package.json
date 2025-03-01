@@ -1,6 +1,6 @@
 {
   "name": "chocho-lexicaleditor",
-  "version": "0.0.11",
+  "version": "0.0.15",
   "main": "./dist/chocho-lexicaleditor.cjs",
   "module": "./dist/chocho-lexicaleditor.js",
   "style": "./dist/chocho-lexicaleditor.css",
@@ -10,10 +10,12 @@
       "import": "./dist/chocho-lexicaleditor.js",
       "require": "./dist/chocho-lexicaleditor.cjs",
       "default": "./dist/chocho-lexicaleditor.js"
-    }
+    },
+    "./style": "./dist/chocho-lexicaleditor.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "dist/chocho-lexicaleditor.css"
   ],
   "type": "module",
   "author": "Michael Emmanuel",
@@ -45,19 +47,21 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^7.2.0",
     "zod": "^3.24.2",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@types/node": "^22.13.5",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
     "eslint": "^9.19.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
+    "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.7.2",
     "vite": "^6.1.0",

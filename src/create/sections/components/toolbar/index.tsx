@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useState, useRef } from "react";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import React, { useState, useRef } from 'react';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
   $getSelection,
   $isRangeSelection,
@@ -9,11 +9,11 @@ import {
   FORMAT_ELEMENT_COMMAND,
   UNDO_COMMAND,
   REDO_COMMAND,
-} from "lexical";
+} from 'lexical';
 import {
   INSERT_UNORDERED_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
-} from "@lexical/list";
+} from '@lexical/list';
 import {
   FiItalic,
   FiLink,
@@ -23,12 +23,12 @@ import {
   FiAlignRight,
   FiRotateCcw,
   FiRotateCw,
-} from "react-icons/fi";
-import { LuPencilLine, LuBold, LuList, LuListOrdered } from "react-icons/lu";
-import { TextFormatType, ElementFormatType, LexicalCommand } from "lexical";
-import { Button, Separator } from "../tool-button";
-import LinkModal from "../link-modal";
-import { useToolbarStore } from "@/store";
+} from 'react-icons/fi';
+import { LuPencilLine, LuBold, LuList, LuListOrdered } from 'react-icons/lu';
+import { TextFormatType, ElementFormatType, LexicalCommand } from 'lexical';
+import { Button, Separator } from '../tool-button';
+import LinkModal from '../link-modal';
+import { useToolbarStore } from '@/store';
 import { useLinkHook } from '@/hooks';
 
 type ToolbarAction = {
@@ -37,56 +37,56 @@ type ToolbarAction = {
     | TextFormatType
     | ElementFormatType
     | LexicalCommand<unknown>
-    | "insertLink";
-  type: "text" | "block" | "list" | "custom";
+    | 'insertLink';
+  type: 'text' | 'block' | 'list' | 'custom';
   label: string;
 };
 
 const TOOLBAR_ACTIONS: ToolbarAction[] = [
-  { icon: <LuBold />, command: "bold", type: "text", label: "Bold" },
-  { icon: <FiItalic />, command: "italic", type: "text", label: "Italic" },
-  { icon: <FiCode />, command: "code", type: "text", label: "Code" },
+  { icon: <LuBold />, command: 'bold', type: 'text', label: 'Bold' },
+  { icon: <FiItalic />, command: 'italic', type: 'text', label: 'Italic' },
+  { icon: <FiCode />, command: 'code', type: 'text', label: 'Code' },
   {
     icon: <FiAlignLeft />,
-    command: "left",
-    type: "block",
-    label: "Align Left",
+    command: 'left',
+    type: 'block',
+    label: 'Align Left',
   },
   {
     icon: <FiAlignCenter />,
-    command: "center",
-    type: "block",
-    label: "Align Center",
+    command: 'center',
+    type: 'block',
+    label: 'Align Center',
   },
   {
     icon: <FiAlignRight />,
-    command: "right",
-    type: "block",
-    label: "Align Right",
+    command: 'right',
+    type: 'block',
+    label: 'Align Right',
   },
   {
     icon: <LuList />,
     command: INSERT_UNORDERED_LIST_COMMAND,
-    type: "list",
-    label: "Bullet List",
+    type: 'list',
+    label: 'Bullet List',
   },
   {
     icon: <LuListOrdered />,
     command: INSERT_ORDERED_LIST_COMMAND,
-    type: "list",
-    label: "Numbered List",
+    type: 'list',
+    label: 'Numbered List',
   },
   {
     icon: <FiLink />,
-    command: "insertLink",
-    type: "custom",
-    label: "Insert Link",
+    command: 'insertLink',
+    type: 'custom',
+    label: 'Insert Link',
   },
 ];
 
 const Toolbar = () => {
   const [editor] = useLexicalComposerContext();
-  const [linkUrl, setLinkUrl] = useState("");
+  const [linkUrl, setLinkUrl] = useState('');
   const { setShowInsertLinkModal } = useToolbarStore();
   const [hoveredLink, setHoveredLink] = useState<{
     url: string;
@@ -98,10 +98,10 @@ const Toolbar = () => {
 
   // :::::::::::::::::::::: Apply Command
   const applyCommand = (
-    command: ToolbarAction["command"],
-    type: ToolbarAction["type"],
+    command: ToolbarAction['command'],
+    type: ToolbarAction['type']
   ) => {
-    if (type === "custom" && command === "insertLink") {
+    if (type === 'custom' && command === 'insertLink') {
       setShowInsertLinkModal(true);
       return;
     }
@@ -112,17 +112,17 @@ const Toolbar = () => {
       if (!$isRangeSelection(selection)) return;
 
       if ($isRangeSelection(selection)) {
-        if (type === "text") {
+        if (type === 'text') {
           editor.dispatchCommand(
             FORMAT_TEXT_COMMAND,
-            command as TextFormatType,
+            command as TextFormatType
           );
-        } else if (type === "block") {
+        } else if (type === 'block') {
           editor.dispatchCommand(
             FORMAT_ELEMENT_COMMAND,
-            command as ElementFormatType,
+            command as ElementFormatType
           );
-        } else if (type === "list") {
+        } else if (type === 'list') {
           editor.dispatchCommand(command as LexicalCommand<unknown>, undefined);
         }
       }
@@ -157,12 +157,12 @@ const Toolbar = () => {
       <Button
         icon={<FiRotateCcw />}
         onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
-        label={"Undo"}
+        label={'Undo'}
       ></Button>
       <Button
         icon={<FiRotateCw />}
         onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
-        label={"Redo"}
+        label={'Redo'}
       ></Button>
 
       {hoveredLink && (
