@@ -1,50 +1,74 @@
-# React + TypeScript + Vite
+# chocho-lexicaleditor
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A rich text editor built using the **Lexical** library, designed for seamless integration into **React** applications.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Lightweight and highly extensible
+- Uses the **Lexical** library for fast, accessible, and reliable text editing
+- Fully typed with TypeScript support
+- Supports custom styling and theming
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Install the package using npm or yarn:
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```sh
+npm install chocho-lexicaleditor
+# or
+yarn add chocho-lexicaleditor
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Usage
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Import the Editor Component
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```tsx
+import React from "react";
+import { Editor } from "chocho-lexicaleditor";
+import "chocho-lexicaleditor/style";
+
+const App = () => {
+    return (
+        <div>
+            <h1>My Rich Text Editor</h1>
+            <Editor />
+        </div>
+    );
+};
+
+export default App;
 ```
+
+### Styling
+
+To apply the default styles, import the CSS file inside your global stylesheet or component:
+
+```css
+@import "chocho-lexicaleditor/style";
+```
+
+## API
+
+### `Editor` Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `placeholder` | `string` | Placeholder text inside the editor |
+| `onChange` | `(value: string) => void` | Callback triggered when content changes |
+| `defaultValue` | `string` | Initial editor content |
+
+Example usage:
+
+```tsx
+<Editor placeholder="Start typing..." onChange={(value) => console.log(value)} />
+```
+
+## Contributing
+
+Contributions are welcome! Feel free to fork this repository, submit issues, or open pull requests.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
