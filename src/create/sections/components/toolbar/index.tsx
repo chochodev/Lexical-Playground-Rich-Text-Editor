@@ -9,6 +9,11 @@ import {
   FORMAT_ELEMENT_COMMAND,
   UNDO_COMMAND,
   REDO_COMMAND,
+  TextFormatType,
+  ElementFormatType,
+  LexicalCommand,
+  $isTextNode,
+  TextNode,
 } from 'lexical';
 import {
   INSERT_UNORDERED_LIST_COMMAND,
@@ -24,8 +29,14 @@ import {
   FiRotateCcw,
   FiRotateCw,
 } from 'react-icons/fi';
-import { LuPencilLine, LuBold, LuList, LuListOrdered } from 'react-icons/lu';
-import { TextFormatType, ElementFormatType, LexicalCommand } from 'lexical';
+import {
+  LuPencilLine,
+  LuBold,
+  LuList,
+  LuListOrdered,
+  LuPlus,
+  LuMinus,
+} from 'react-icons/lu';
 import { Button, Separator } from '../tool-button';
 import LinkModal from '../link-modal';
 import { useToolbarStore } from '@/store';
@@ -37,7 +48,9 @@ type ToolbarAction = {
     | TextFormatType
     | ElementFormatType
     | LexicalCommand<unknown>
-    | 'insertLink';
+    | 'insertLink'
+    | 'increaseFontSize'
+    | 'decreaseFontSize';
   type: 'text' | 'block' | 'list' | 'custom';
   label: string;
 };
@@ -136,6 +149,36 @@ const Toolbar = () => {
     setLinkUrl,
   });
 
+  // :::::::::::::::::: Font Size
+  const changeFontSize = (increment: boolean) => {
+    editor.update(() => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) return;
+  
+      const anchorNode = selection.anchor.getNode();
+      const focusNode = selection.focus.getNode();
+  
+      // Collect all text nodes within the selection
+      const selectedNodes = selection.getNodes().filter($isTextNode) as TextNode[];
+  
+      if (selectedNodes.length === 0) return;
+  
+      selectedNodes.forEach((textNode) => {
+        // Get current style
+        let style = textNode.getStyle();
+        let match = style.match(/font-size:\s*(\d+)px/);
+        let currentSize = match ? parseInt(match[1]) : 16; // Default to 16px
+  
+        // Calculate new font size
+        let newSize = increment ? currentSize + 2 : Math.max(10, currentSize - 2);
+  
+        // Remove existing font-size declaration before setting a new one
+        style = style.replace(/font-size:\s*\d+px;?/g, '').trim();
+        textNode.setStyle(`font-size: ${newSize}px; ${style}`);
+      });
+    });
+  };
+
   return (
     <div className="relative flex flex-wrap gap-2 rounded-md bg-gray-100 p-2">
       {TOOLBAR_ACTIONS.map(({ icon, command, type, label }, index) => (
@@ -153,17 +196,32 @@ const Toolbar = () => {
       {/* ::::::::::::::::::::::: Separator */}
       <Separator />
 
+      <Button
+        icon={<LuPlus />}
+        onClick={() => changeFontSize(true)}
+        label={'Increase Size'}
+      />
+
+      <Button
+        icon={<LuMinus />}
+        onClick={() => changeFontSize(false)}
+        label={'Decrease Size'}
+      />
+
+      {/* ::::::::::::::::::::::: Separator */}
+      <Separator />
+
       {/* Undo & Redo Buttons */}
       <Button
         icon={<FiRotateCcw />}
         onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
         label={'Undo'}
-      ></Button>
+      />
       <Button
         icon={<FiRotateCw />}
         onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
         label={'Redo'}
-      ></Button>
+      />
 
       {hoveredLink && (
         <button
