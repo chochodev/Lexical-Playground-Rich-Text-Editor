@@ -41,7 +41,7 @@ import { Button, Separator } from '../tool-button';
 import LinkModal from '../link-modal';
 import { useToolbarStore } from '@/store';
 import { useLinkHook } from '@/hooks';
-import { LexicalEditor } from 'lexical';
+// import { LexicalEditor } from 'lexical';
 import { updateFontSizeInSelection } from './utils';
 
 type ToolbarAction = {
