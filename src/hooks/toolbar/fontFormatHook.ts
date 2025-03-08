@@ -9,7 +9,7 @@ import {
   FORMAT_ELEMENT_COMMAND,
   LexicalCommand,
 } from "lexical";
-import { $isHeadingNode, HeadingNode } from "@lexical/rich-text";
+import { $isHeadingNode } from "@lexical/rich-text";
 import { useToolbarStore } from "@/store";
 import {
   updateFontSizeInSelection,

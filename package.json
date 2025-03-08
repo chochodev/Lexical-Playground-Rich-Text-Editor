@@ -1,6 +1,6 @@
 {
   "name": "chocho-lexicaleditor",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "main": "./dist/chocho-lexicaleditor.cjs",
   "module": "./dist/chocho-lexicaleditor.js",
   "style": "./dist/chocho-lexicaleditor.css",
