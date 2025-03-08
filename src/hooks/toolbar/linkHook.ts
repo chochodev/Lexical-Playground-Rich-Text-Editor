@@ -1,18 +1,19 @@
 import { useEffect } from 'react';
 import { z } from 'zod';
 import { TOGGLE_LINK_COMMAND, $isLinkNode } from "@lexical/link";
-import { useAlertStore, useToolbarStore } from '@/store';
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { useToolbarStore } from '@/store';
 import {
   $getSelection,
   $isRangeSelection,
 } from "lexical";
+import { addToast } from '@heroui/react';
 
 const useLinkHook = ({
-  editor,
   setHoveredLink,
   setLinkUrl
 }) => {
-  const { setAlert } = useAlertStore();
+  const [editor] = useLexicalComposerContext();
   const { setShowInsertLinkModal, } = useToolbarStore();
 
   useEffect(() => {
@@ -67,10 +68,10 @@ const useLinkHook = ({
     // :::::::::::::::::::::: Validates URL
     const result = urlSchema.safeParse(link);
     if (!result.success) {
-      setAlert({
+      addToast({
         title: "Invalid URL",
-        message: "Please enter a valid URL (usually starts with `https://`).",
-        type: "warning",
+        description: "Please enter a valid URL (usually starts with `https://`).",
+        color: "warning",
       });
       return;
     }

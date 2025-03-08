@@ -23,9 +23,9 @@ import {
   LexicalEditor,
 } from 'lexical';
 
-const DEFAULT_FONT_SIZE = 14;
-const MAX_ALLOWED_FONT_SIZE = 36;
-const MIN_ALLOWED_FONT_SIZE = 8;
+export const DEFAULT_FONT_SIZE = 16;
+export const MAX_ALLOWED_FONT_SIZE = 36;
+export const MIN_ALLOWED_FONT_SIZE = 8;
 
 // eslint-disable-next-line no-shadow
 export enum UpdateFontSizeType {

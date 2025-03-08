@@ -1,19 +1,10 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
-  $getSelection,
-  $isRangeSelection,
-  FORMAT_TEXT_COMMAND,
-  FORMAT_ELEMENT_COMMAND,
   UNDO_COMMAND,
   REDO_COMMAND,
-  TextFormatType,
-  ElementFormatType,
-  LexicalCommand,
-  $isTextNode,
-  TextNode,
 } from 'lexical';
 import {
   INSERT_UNORDERED_LIST_COMMAND,
@@ -36,26 +27,20 @@ import {
   LuListOrdered,
   LuPlus,
   LuMinus,
+  LuChevronsUpDown,
+  LuHeading1,
+  LuHeading2,
+  LuHeading3,
 } from 'react-icons/lu';
+import { BiParagraph } from 'react-icons/bi';
 import { Button, Separator } from '../tool-button';
 import LinkModal from '../link-modal';
+import { Select, SelectItem } from '@heroui/react';
 import { useToolbarStore } from '@/store';
-import { useLinkHook } from '@/hooks';
+import { useLinkHook, useFontSize } from '@/hooks';
 // import { LexicalEditor } from 'lexical';
-import { updateFontSizeInSelection } from './utils';
-
-type ToolbarAction = {
-  icon: React.ReactNode;
-  command:
-    | TextFormatType
-    | ElementFormatType
-    | LexicalCommand<unknown>
-    | 'insertLink'
-    | 'increaseFontSize'
-    | 'decreaseFontSize';
-  type: 'text' | 'block' | 'list' | 'custom';
-  label: string;
-};
+import { DEFAULT_FONT_SIZE } from '@/lib/utils';
+import { type ToolbarAction } from '@/types/toolbar-type';
 
 const TOOLBAR_ACTIONS: ToolbarAction[] = [
   { icon: <LuBold />, command: 'bold', type: 'text', label: 'Bold' },
@@ -102,7 +87,8 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
 const Toolbar = () => {
   const [editor] = useLexicalComposerContext();
   const [linkUrl, setLinkUrl] = useState('');
-  const { setShowInsertLinkModal } = useToolbarStore();
+  const { setShowInsertLinkModal, currentFontSize, currentBlockType } =
+    useToolbarStore();
   const [hoveredLink, setHoveredLink] = useState<{
     url: string;
     x: number;
@@ -111,76 +97,20 @@ const Toolbar = () => {
 
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // :::::::::::::::::::::: Apply Command
-  const applyCommand = (
-    command: ToolbarAction['command'],
-    type: ToolbarAction['type']
-  ) => {
-    if (type === 'custom' && command === 'insertLink') {
-      setShowInsertLinkModal(true);
-      return;
-    }
-
-    editor.update(() => {
-      const selection = $getSelection();
-
-      if (!$isRangeSelection(selection)) return;
-
-      if ($isRangeSelection(selection)) {
-        if (type === 'text') {
-          editor.dispatchCommand(
-            FORMAT_TEXT_COMMAND,
-            command as TextFormatType
-          );
-        } else if (type === 'block') {
-          editor.dispatchCommand(
-            FORMAT_ELEMENT_COMMAND,
-            command as ElementFormatType
-          );
-        } else if (type === 'list') {
-          editor.dispatchCommand(command as LexicalCommand<unknown>, undefined);
-        }
-      }
-    });
-  };
+  
 
   // :::::::::::::::::::::: Hook: Manipulate Links (Insert, Unlink, Edit)
   const { insertLink, unlinkText } = useLinkHook({
-    editor,
     setHoveredLink,
     setLinkUrl,
   });
 
-  // :::::::::::::::::: Font Size
-  const changeFontSize = (increment: boolean) => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if (!$isRangeSelection(selection)) return;
-
-      const selectedNodes = selection
-        .getNodes()
-        .filter($isTextNode) as TextNode[];
-      if (selectedNodes.length === 0) return;
-
-      selectedNodes.forEach((textNode) => {
-        // Extract current font size
-        let style = textNode.getStyle();
-        let match = style.match(/font-size:\s*(\d+)px/);
-        let currentSize = match ? parseInt(match[1]) : 16; // Default to 16px
-
-        // Calculate new size
-        let newSize = increment
-          ? currentSize + 2
-          : Math.max(10, currentSize - 2);
-
-        // Use Lexical utility function to update selection
-        updateFontSizeInSelection(editor, `${newSize}px`, null);
-      });
-    });
-  };
+  const { changeFontSize, changeTextFormat, applyCommand } = useFontSize();
+  useFontSize();
+  
 
   return (
-    <div className="relative flex flex-wrap gap-2 rounded-md bg-gray-100 p-2">
+    <div className="relative flex flex-wrap gap-2 rounded-md bg-gray-50 p-2">
       {TOOLBAR_ACTIONS.map(({ icon, command, type, label }, index) => (
         <div key={index} className="relative">
           <Button
@@ -196,16 +126,25 @@ const Toolbar = () => {
       {/* ::::::::::::::::::::::: Separator */}
       <Separator />
 
-      <Button
-        icon={<LuPlus />}
-        onClick={() => changeFontSize(true)}
-        label={'Increase Size'}
-      />
-
+      {/* :::::::::::::::::::::::: Font Size Control */}
       <Button
         icon={<LuMinus />}
         onClick={() => changeFontSize(false)}
         label={'Decrease Size'}
+      />
+
+      <input
+        type="text"
+        className="w-8 h-7 my-auto text-sm rounded-md border border-solid border-gray-200 text-center"
+        placeholder={`${DEFAULT_FONT_SIZE}`}
+        value={`${currentFontSize}`}
+        disabled
+      />
+
+      <Button
+        icon={<LuPlus />}
+        onClick={() => changeFontSize(true)}
+        label={'Increase Size'}
       />
 
       {/* ::::::::::::::::::::::: Separator */}
@@ -222,6 +161,48 @@ const Toolbar = () => {
         onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
         label={'Redo'}
       />
+
+      <Select
+        disableSelectorIconRotation
+        aria-label="Block Type"
+        className="max-w-[4.5rem]"
+        variant="faded"
+        radius="sm"
+        size="sm"
+        selectedKeys={new Set([currentBlockType])}
+        onSelectionChange={(keys) => {
+          // Convert the Set to an array and get the first item
+          const selectedKey = Array.from(keys)[0] as string;
+          if (selectedKey) {
+            changeTextFormat(selectedKey);
+          }
+        }}
+        placeholder={
+          currentBlockType === 'paragraph'
+            ? 'P'
+            : currentBlockType === 'h1'
+            ? 'H1'
+            : currentBlockType === 'h2'
+            ? 'H2'
+            : currentBlockType === 'h3'
+            ? 'H3'
+            : 'H0'
+        }
+        selectorIcon={<LuChevronsUpDown />}
+      >
+        <SelectItem key="paragraph" textValue="paragraph">
+          <BiParagraph className="text-[1.5rem]" />
+        </SelectItem>
+        <SelectItem key="h1" textValue="h1">
+          <LuHeading1 className="text-[1.5rem]" />
+        </SelectItem>
+        <SelectItem key="h2" textValue="h2">
+          <LuHeading2 className="text-[1.5rem]" />
+        </SelectItem>
+        <SelectItem key="h3" textValue="h3">
+          <LuHeading3 className="text-[1.5rem]" />
+        </SelectItem>
+      </Select>
 
       {hoveredLink && (
         <button
