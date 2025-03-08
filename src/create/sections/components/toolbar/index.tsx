@@ -2,10 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import {
-  UNDO_COMMAND,
-  REDO_COMMAND,
-} from 'lexical';
+import { UNDO_COMMAND, REDO_COMMAND } from 'lexical';
 import {
   INSERT_UNORDERED_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
@@ -37,7 +34,7 @@ import { Button, Separator } from '../tool-button';
 import LinkModal from '../link-modal';
 import { Select, SelectItem } from '@heroui/react';
 import { useToolbarStore } from '@/store';
-import { useLinkHook, useFontSize } from '@/hooks';
+import { useLinkHook, useFontFormat } from '@/hooks';
 // import { LexicalEditor } from 'lexical';
 import { DEFAULT_FONT_SIZE } from '@/lib/utils';
 import { type ToolbarAction } from '@/types/toolbar-type';
@@ -97,17 +94,14 @@ const Toolbar = () => {
 
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  
-
   // :::::::::::::::::::::: Hook: Manipulate Links (Insert, Unlink, Edit)
   const { insertLink, unlinkText } = useLinkHook({
     setHoveredLink,
     setLinkUrl,
   });
 
-  const { changeFontSize, changeTextFormat, applyCommand } = useFontSize();
-  useFontSize();
-  
+  const { changeFontSize, changeTextFormat, applyCommand } = useFontFormat();
+  useFontFormat();
 
   return (
     <div className="relative flex flex-wrap gap-2 rounded-md bg-gray-50 p-2">
@@ -165,7 +159,7 @@ const Toolbar = () => {
       <Select
         disableSelectorIconRotation
         aria-label="Block Type"
-        className="max-w-[4.5rem]"
+        className="max-w-[8rem]"
         variant="faded"
         radius="sm"
         size="sm"
@@ -176,6 +170,7 @@ const Toolbar = () => {
           if (selectedKey) {
             changeTextFormat(selectedKey);
           }
+          console.log('block type', currentBlockType);
         }}
         placeholder={
           currentBlockType === 'paragraph'
@@ -186,20 +181,23 @@ const Toolbar = () => {
             ? 'H2'
             : currentBlockType === 'h3'
             ? 'H3'
-            : 'H0'
+            : currentBlockType === 'root'
+            ? 'None'
+            : currentBlockType.charAt(0).toUpperCase() +
+              currentBlockType.slice(1)
         }
         selectorIcon={<LuChevronsUpDown />}
       >
-        <SelectItem key="paragraph" textValue="paragraph">
+        <SelectItem key="paragraph" textValue="Paragraph">
           <BiParagraph className="text-[1.5rem]" />
         </SelectItem>
-        <SelectItem key="h1" textValue="h1">
+        <SelectItem key="h1" textValue="H1">
           <LuHeading1 className="text-[1.5rem]" />
         </SelectItem>
-        <SelectItem key="h2" textValue="h2">
+        <SelectItem key="h2" textValue="H2">
           <LuHeading2 className="text-[1.5rem]" />
         </SelectItem>
-        <SelectItem key="h3" textValue="h3">
+        <SelectItem key="h3" textValue="H3">
           <LuHeading3 className="text-[1.5rem]" />
         </SelectItem>
       </Select>

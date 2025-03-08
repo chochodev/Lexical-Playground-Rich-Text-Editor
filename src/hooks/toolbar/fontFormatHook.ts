@@ -9,6 +9,7 @@ import {
   FORMAT_ELEMENT_COMMAND,
   LexicalCommand,
 } from "lexical";
+import { $isHeadingNode, HeadingNode } from "@lexical/rich-text";
 import { useToolbarStore } from "@/store";
 import {
   updateFontSizeInSelection,
@@ -19,13 +20,13 @@ import {
 import { type ToolbarAction } from "@/types/toolbar-type";
 import { TextFormatType, ElementFormatType } from "lexical";
 
-const useFontSize = () => {
+const useFontFormat = () => {
   const [editor] = useLexicalComposerContext();
-  const { 
-    setCurrentFontSize, 
-    setCurrentBlockType, 
-    setShowInsertLinkModal, 
-    currentBlockType 
+  const {
+    setCurrentFontSize,
+    setCurrentBlockType,
+    setShowInsertLinkModal,
+    currentBlockType
   } = useToolbarStore();
 
   // :::::::::::::::::::::: Extract font size from selected text
@@ -61,7 +62,19 @@ const useFontSize = () => {
 
         const node = selection.anchor.getNode();
         const parent = node.getParent();
-        if (parent) setCurrentBlockType(parent.getType());
+
+        if (!parent) return
+
+        console.log("Utils blockType: ", currentBlockType);
+        
+        if (parent.getType() !== "heading") {
+          console.log("Utils Parent Type: ", parent.getType());
+          setCurrentBlockType(
+            parent.getType()
+          );
+        } else if (parent.getType() === "heading" && $isHeadingNode(parent)) {
+          setCurrentBlockType(parent.getTag());
+        }
       });
     });
 
@@ -145,21 +158,16 @@ const useFontSize = () => {
     switch (formatType) {
       case 'paragraph':
         formatParagraph(editor);
+        setCurrentBlockType("paragraph");
         break;
       case 'h1':
         formatHeading(editor, currentBlockType, 'h1');
-        changeExactFontSize(32);
-        applyCommand("bold", "text");
         break;
       case 'h2':
         formatHeading(editor, currentBlockType, 'h2');
-        applyCommand("bold", "text");
-        changeExactFontSize(22);
         break;
       case 'h3':
         formatHeading(editor, currentBlockType, 'h3');
-        applyCommand("bold", "text");
-        changeExactFontSize(18);
         break;
       default:
         break;
@@ -169,4 +177,4 @@ const useFontSize = () => {
   return { changeFontSize, changeExactFontSize, changeTextFormat, applyCommand };
 };
 
-export default useFontSize;
+export default useFontFormat;

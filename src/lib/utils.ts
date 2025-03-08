@@ -156,7 +156,7 @@ export const formatParagraph = (editor: LexicalEditor) => {
 export const formatHeading = (
   editor: LexicalEditor,
   blockType: string,
-  headingSize: HeadingTagType,
+  headingSize: HeadingTagType
 ) => {
   if (blockType !== headingSize) {
     editor.update(() => {
