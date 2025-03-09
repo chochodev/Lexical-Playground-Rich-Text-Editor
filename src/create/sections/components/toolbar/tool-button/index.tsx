@@ -34,7 +34,7 @@ const Button: React.FC<ButtonProps> = ({ icon, label, ...props }) => {
 
 // :::::::::::::::: Separator
 const Separator: React.FC = () => (
-  <div className="mx-[1rem] h-6 w-px bg-gray-300" />
+  <div className="mx-[1rem] my-auto h-6 w-px bg-gray-300" />
 );
 
 export { Button, Separator };

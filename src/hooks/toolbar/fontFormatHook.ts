@@ -10,12 +10,19 @@ import {
   LexicalCommand,
 } from "lexical";
 import { $isHeadingNode } from "@lexical/rich-text";
+
+import { $patchStyleText } from '@lexical/selection';
 import { useToolbarStore } from "@/store";
 import {
   updateFontSizeInSelection,
   DEFAULT_FONT_SIZE,
   formatHeading,
-  formatParagraph
+  formatParagraph,
+  formatBulletList,
+  formatNumberedList,
+  formatCheckList,
+  formatQuote,
+  formatCode
 } from "@/lib/utils";
 import { type ToolbarAction } from "@/types/toolbar-type";
 import { TextFormatType, ElementFormatType } from "lexical";
@@ -23,13 +30,14 @@ import { TextFormatType, ElementFormatType } from "lexical";
 const useFontFormat = () => {
   const [editor] = useLexicalComposerContext();
   const {
-    setCurrentFontSize,
+    setTextProperties,
     setCurrentBlockType,
     setShowInsertLinkModal,
-    currentBlockType
+    currentBlockType,
+    setCurrentAlignFormat
   } = useToolbarStore();
 
-  // :::::::::::::::::::::: Extract font size from selected text
+  // :::::::::::::::::::::: Hook: Updates font styles from selected text
   useEffect(() => {
     const unregisterListener = editor.registerUpdateListener(
       ({ editorState }) => {
@@ -38,22 +46,31 @@ const useFontFormat = () => {
           if (!$isRangeSelection(selection)) return;
 
           const selectedNodes = selection.getNodes().filter($isTextNode) as TextNode[];
-          if (selectedNodes.length === 0) return;
+          if (!selectedNodes.length) return;
 
-          // Extract the font size from the first selected node
+          // Extract the font styles from the first selected node
           const firstNode = selectedNodes[0];
           const style = firstNode.getStyle();
-          const match = style.match(/font-size:\s*(\d+)px/);
-          const size = match ? parseInt(match[1]) : DEFAULT_FONT_SIZE;
+          const match_font_size = style.match(/font-size:\s*(\d+)px/);
+          const match_font_weight = style.match(/font-weight:\s*(\d+)/);
+          const match_font_family = style.match(/font-family:\s*(\d+)/);
 
-          setCurrentFontSize(size);
+          const size = match_font_size ? parseInt(match_font_size[1]) : DEFAULT_FONT_SIZE;
+          const weight = match_font_weight ? match_font_weight[1] : "normal";
+          const family = match_font_family ? match_font_family[1] : "Arial";
+
+          console.log('font family: ', family);
+
+          setTextProperties({
+            fontSize: size, fontWeight: String(weight), fontFamily: String(family)
+          });
         });
       })
 
     return () => unregisterListener();
-  }, [editor, setCurrentFontSize]);
+  }, [editor, setTextProperties]);
 
-  // :::::::::::::::::::::: Get Current Block Type
+  // :::::::::::::::::::::: Hook: Updates Current Block Type & Align Format
   useEffect(() => {
     const unregisterListener = editor.registerUpdateListener(({ editorState }) => {
       editorState.read(() => {
@@ -65,21 +82,20 @@ const useFontFormat = () => {
 
         if (!parent) return
 
-        console.log("Utils blockType: ", currentBlockType);
-        
-        if (parent.getType() !== "heading") {
-          console.log("Utils Parent Type: ", parent.getType());
+        if (!$isHeadingNode(parent)) {
           setCurrentBlockType(
-            parent.getType()
+            parent.getType() || 'paragraph'
           );
-        } else if (parent.getType() === "heading" && $isHeadingNode(parent)) {
+        } else if ($isHeadingNode(parent)) {
           setCurrentBlockType(parent.getTag());
         }
+
+        setCurrentAlignFormat(parent.getFormatType() || "left");
       });
     });
 
     return () => unregisterListener();
-  }, [editor, setCurrentBlockType]);
+  }, [editor, setCurrentBlockType, setCurrentAlignFormat]);
 
   // :::::::::::::::::::::: Function to change font size
   const changeFontSize = (increment: boolean) => {
@@ -99,7 +115,7 @@ const useFontFormat = () => {
           Math.min(42, currentSize + 2) : Math.max(10, currentSize - 2);
         updateFontSizeInSelection(editor, `${newSize}px`, null);
 
-        setCurrentFontSize(newSize);
+        setTextProperties({ fontSize: newSize });
       });
     });
   };
@@ -149,7 +165,7 @@ const useFontFormat = () => {
       if (!selectedNodes.length) return;
 
       updateFontSizeInSelection(editor, `${size}px`, null);
-      setCurrentFontSize(size);
+      setTextProperties({ fontSize: size });
     });
   };
 
@@ -169,12 +185,62 @@ const useFontFormat = () => {
       case 'h3':
         formatHeading(editor, currentBlockType, 'h3');
         break;
+      case "bullet":
+        formatBulletList(editor, currentBlockType)
+        break
+      case "number":
+        formatNumberedList(editor, currentBlockType)
+        break
+      case "check":
+        formatCheckList(editor, currentBlockType)
+        break
+      case "quote":
+        formatQuote(editor, currentBlockType)
+        break
+      case "code":
+        formatCode(editor, currentBlockType)
+        break
       default:
         break;
     }
   };
 
-  return { changeFontSize, changeExactFontSize, changeTextFormat, applyCommand };
+  // :::::::::::::::::::::: Function: Set Font Weight
+  const setFontWeight = (fontWeight: string) => {
+    editor.update(() => {
+      const selection = $getSelection();
+
+      if ($isRangeSelection(selection)) {
+        const newStyle = fontWeight === "normal"
+          ? { "font-weight": null }
+          : { "font-weight": fontWeight };
+
+        $patchStyleText(selection, newStyle);
+      }
+    });
+  };
+
+  // :::::::::::::::::::::: Function: Set Font Family
+  const setFontFamily = (fontFamily: string) => {
+    editor.update(() => {
+      const selection = $getSelection();
+
+      if ($isRangeSelection(selection)) {
+        $patchStyleText(selection, {
+          'font-family': fontFamily,
+        });
+      }
+    });
+  };
+
+  return {
+    changeFontSize,
+    changeExactFontSize,
+    changeTextFormat,
+    setFontWeight,
+    setFontFamily,
+    applyCommand,
+  };
 };
 
 export default useFontFormat;
