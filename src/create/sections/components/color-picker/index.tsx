@@ -24,8 +24,6 @@ export const ColorPicker = ({
       ? textProperties.backgroundColor
       : textProperties.textColor;
 
-  // console.log('type & color: ', type, selectedColor);
-  // console.log('color props: ', textProperties.textColor);
   const pickerRef = useRef<HTMLDivElement>(null);
 
   // Close the picker when clicking outside

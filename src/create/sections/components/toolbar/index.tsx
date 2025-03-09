@@ -5,10 +5,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import {
   UNDO_COMMAND,
   REDO_COMMAND,
-  $getSelection,
-  $isRangeSelection,
 } from 'lexical';
-import { $patchStyleText } from '@lexical/selection';
 import {
   INSERT_UNORDERED_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
