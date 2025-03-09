@@ -71,7 +71,7 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
   },
 ];
 
-const TEXT_FORMAT_OPTIONS = [
+export const TEXT_FORMAT_OPTIONS = [
   {
     key: 'root',
     label: 'None',
@@ -129,6 +129,7 @@ const TEXT_FORMAT_OPTIONS = [
 ];
 
 const FONT_FAMILY_OPTIONS: [string, string][] = [
+  ['Inter', 'Inter'],
   ['Arial', 'Arial'],
   ['Courier New', 'Courier New'],
   ['Georgia', 'Georgia'],
@@ -177,6 +178,8 @@ const Toolbar = () => {
     applyCommand,
     setFontWeight,
     setFontFamily,
+    setTextColor,
+    setBackgroundColor,
   } = useFontFormat();
   useFontFormat();
 
@@ -403,14 +406,12 @@ const Toolbar = () => {
       <ColorPicker
         type="text"
         label="Text Color"
-        defaultColor="#000000"
-        onChange={() => {}}
+        onChange={(value) => setTextColor(value)}
       />
       <ColorPicker
         type="background"
         label="Background Color"
-        defaultColor="#ffffff"
-        onChange={() => {}}
+        onChange={(value) => setBackgroundColor(value)}
       />
 
       {/* insert image, list, font family */}

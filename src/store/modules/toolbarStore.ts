@@ -7,6 +7,8 @@ interface TextProperties {
   fontFamily?: string;
   fontWeight?: string;
   textAlign?: "left" | "center" | "right" | "justify";
+  textColor?: string;
+  backgroundColor: string;
 }
 
 interface ToolbarStore {  
@@ -33,9 +35,11 @@ export const useToolbarStore = create<ToolbarStore>((set) => ({
   textProperties: {
     blockType: "paragraph",
     fontSize: DEFAULT_FONT_SIZE,
-    fontFamily: "Arial",
+    fontFamily: "Inter",
     fontWeight: "normal",
     textAlign: "left",
+    textColor: "#000000",
+    backgroundColor: "#ffffff",
   },
 
   currentAlignFormat: "left",

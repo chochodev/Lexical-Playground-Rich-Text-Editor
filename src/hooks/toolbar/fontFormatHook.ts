@@ -51,18 +51,27 @@ const useFontFormat = () => {
           // Extract the font styles from the first selected node
           const firstNode = selectedNodes[0];
           const style = firstNode.getStyle();
+          console.log("Extracted Style:", style);
           const match_font_size = style.match(/font-size:\s*(\d+)px/);
           const match_font_weight = style.match(/font-weight:\s*(\d+)/);
-          const match_font_family = style.match(/font-family:\s*(\d+)/);
+          const match_font_family = style.match(/font-family:\s*([^;]+)/);
+          const match_text_color = style.match(/(?:^|;)\s*color:\s*([^;]+)(?=;|$)/);
+          const match_background_color = style.match(/(?:^|;)\s*background-color:\s*([^;]+)(?=;|$)/);
 
           const size = match_font_size ? parseInt(match_font_size[1]) : DEFAULT_FONT_SIZE;
           const weight = match_font_weight ? match_font_weight[1] : "normal";
-          const family = match_font_family ? match_font_family[1] : "Arial";
+          const family = match_font_family ? match_font_family[1].trim() : "Inter";
+          const color = match_text_color ? match_text_color[1].trim() : "#000000";
+          const bgColor = match_background_color ? match_background_color[1].trim() : "#ffffff";
 
-          console.log('font family: ', family);
+          console.log('color: ', color, '\nbg-color: ', bgColor);
 
           setTextProperties({
-            fontSize: size, fontWeight: String(weight), fontFamily: String(family)
+            fontSize: size,
+            fontWeight: String(weight),
+            fontFamily: String(family),
+            textColor: color,
+            backgroundColor: bgColor
           });
         });
       })
@@ -233,12 +242,40 @@ const useFontFormat = () => {
     });
   };
 
+  // :::::::::::::::::::::: Function: Set Font Family
+  const setTextColor = (color: string) => {
+    editor.update(() => {
+      const selection = $getSelection();
+
+      if ($isRangeSelection(selection)) {
+        $patchStyleText(selection, {
+          'color': color,
+        });
+      }
+    });
+  };
+
+  // :::::::::::::::::::::: Function: Set Font Family
+  const setBackgroundColor = (bgColor: string) => {
+    editor.update(() => {
+      const selection = $getSelection();
+
+      if ($isRangeSelection(selection)) {
+        $patchStyleText(selection, {
+          'background-color': bgColor,
+        });
+      }
+    });
+  };
+
   return {
     changeFontSize,
     changeExactFontSize,
     changeTextFormat,
     setFontWeight,
     setFontFamily,
+    setTextColor,
+    setBackgroundColor,
     applyCommand,
   };
 };

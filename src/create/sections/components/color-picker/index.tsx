@@ -4,22 +4,28 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@heroui/react';
 import { LuPaintbrush, LuText } from 'react-icons/lu';
 import { SketchPicker, type ColorResult } from 'react-color';
+import { useToolbarStore } from '@/store';
 
 interface ColorPickerProps {
-  defaultColor?: string;
   label?: string;
   type?: 'text' | 'background';
   onChange?: (color: string) => void;
 }
 
 export const ColorPicker = ({
-  defaultColor = '#000000',
   label = 'Text Color',
   type = 'text',
   onChange,
 }: ColorPickerProps) => {
+  const { textProperties, setTextProperties } = useToolbarStore();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedColor, setSelectedColor] = useState(defaultColor);
+  const selectedColor =
+    type === 'background'
+      ? textProperties.backgroundColor
+      : textProperties.textColor;
+
+  // console.log('type & color: ', type, selectedColor);
+  // console.log('color props: ', textProperties.textColor);
   const pickerRef = useRef<HTMLDivElement>(null);
 
   // Close the picker when clicking outside
@@ -40,7 +46,11 @@ export const ColorPicker = ({
   }, []);
 
   const handleColorChange = (color: ColorResult) => {
-    setSelectedColor(color.hex);
+    if (type === 'background') {
+      setTextProperties({ backgroundColor: color.hex });
+    } else {
+      setTextProperties({ textColor: color.hex });
+    }
     onChange?.(color.hex);
   };
 
