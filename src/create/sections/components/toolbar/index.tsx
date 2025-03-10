@@ -2,10 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import {
-  UNDO_COMMAND,
-  REDO_COMMAND,
-} from 'lexical';
+import { UNDO_COMMAND, REDO_COMMAND } from 'lexical';
 import {
   INSERT_UNORDERED_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
@@ -38,12 +35,14 @@ import {
 import { BiParagraph } from 'react-icons/bi';
 import { Button as ToolButton, Separator } from './tool-button';
 import LinkModal from '../link-modal';
-import { Select, SelectItem } from '@heroui/react';
+import { Button, Select, SelectItem } from '@heroui/react';
 import { useToolbarStore } from '@/store';
 import { useLinkHook, useFontFormat } from '@/hooks';
 import { DEFAULT_FONT_SIZE } from '@/lib/utils';
 import { type ToolbarAction } from '@/types/toolbar-type';
 import { ColorPicker } from '../color-picker';
+import { InsertImageDialog } from '@/plugins/ImagesPlugin';
+import useModal from '@/hooks/useModal';
 
 const TOOLBAR_ACTIONS: ToolbarAction[] = [
   { icon: <FiItalic />, command: 'italic', type: 'text', label: 'Italic' },
@@ -154,6 +153,7 @@ const Toolbar = () => {
     currentBlockType,
     currentAlignFormat,
   } = useToolbarStore();
+
   const [hoveredLink, setHoveredLink] = useState<{
     url: string;
     x: number;
@@ -180,8 +180,22 @@ const Toolbar = () => {
   } = useFontFormat();
   useFontFormat();
 
+  const [modal, showModal] = useModal();
+
   return (
     <div className="relative flex flex-wrap gap-2 rounded-md bg-gray-50 p-2">
+      <Button
+        onPress={() => {
+          showModal('Insert Image', (onClose) => (
+            <InsertImageDialog activeEditor={editor} onClose={onClose} />
+          ));
+        }}
+        className="item"
+      >
+        <i className="icon image" />
+        <span className="text">Image</span>
+      </Button>
+
       <ToolButton
         icon={<LuBold />}
         onClick={() => {
@@ -246,6 +260,11 @@ const Toolbar = () => {
         }
         selectorIcon={<LuChevronsUpDown />}
       >
+        <SelectItem key="root" style={{ display: 'hidden' }} textValue="Root">
+          <div className="flex gap-2 items-center w-full">
+            <LuHeading3 className="text-[1.5rem]" /> <span>Root</span>
+          </div>
+        </SelectItem>
         <SelectItem key="paragraph" textValue="Paragraph">
           <div className="flex gap-2 items-center w-full">
             <BiParagraph className="text-[1.5rem]" />
@@ -450,6 +469,8 @@ const Toolbar = () => {
         insertLink={insertLink}
         unlinkText={unlinkText}
       />
+
+      {modal}
     </div>
   );
 };
