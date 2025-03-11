@@ -67,6 +67,7 @@ export class AutocompleteNode extends TextNode {
   }
 
   updateDOM(prevNode: this, dom: HTMLElement, config: EditorConfig): boolean {
+    console.log('updateDOM implemented', prevNode, dom, config);
     return false;
   }
 

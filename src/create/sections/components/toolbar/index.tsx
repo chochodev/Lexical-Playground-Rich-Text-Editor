@@ -6,7 +6,7 @@ import { UNDO_COMMAND, REDO_COMMAND } from 'lexical';
 import {
   FiItalic,
   FiLink,
-  FiCode,
+  // FiCode,
   FiRotateCcw,
   FiRotateCw,
 } from 'react-icons/fi';
@@ -42,7 +42,7 @@ import ImageModal from '../image-modal';
 
 const TOOLBAR_ACTIONS: ToolbarAction[] = [
   { icon: <FiItalic />, command: 'italic', type: 'text', label: 'Italic' },
-  { icon: <FiCode />, command: 'code', type: 'text', label: 'Code' },
+  // { icon: <FiCode />, command: 'code', type: 'text', label: 'Code' },
   {
     icon: <FiLink />,
     command: 'insertLink',
@@ -244,8 +244,6 @@ const Toolbar = () => {
         label="Background Color"
         onChange={(value) => setBackgroundColor(value)}
       />
-
-      {/* insert image, list, font family */}
 
       {/* ::::::::::::::::::::::: Separator */}
       <Separator />
