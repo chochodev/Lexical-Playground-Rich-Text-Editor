@@ -132,7 +132,7 @@ const FONT_WEIGHTS = [
 const Toolbar = () => {
   const [editor] = useLexicalComposerContext();
   const [linkUrl, setLinkUrl] = useState('');
-  const [showImageModal, setShowImageModal] = useState(true);
+  const [showImageModal, setShowImageModal] = useState(false);
   const {
     setShowInsertLinkModal,
     textProperties,

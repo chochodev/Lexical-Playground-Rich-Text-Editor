@@ -123,6 +123,7 @@ export function $createMentionNode(
   mentionName: string,
   textContent?: string,
 ): MentionNode {
+  console.log('mentionName', textContent);
   const mentionNode = new MentionNode(mentionName, (textContent = mentionName));
   mentionNode.setMode('segmented').toggleDirectionless();
   return $applyNodeReplacement(mentionNode);

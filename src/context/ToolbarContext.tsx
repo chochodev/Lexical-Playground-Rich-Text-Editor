@@ -9,7 +9,7 @@
 import type {JSX} from 'react';
 
 import {ElementFormatType} from 'lexical';
-import {
+import React, {
   createContext,
   ReactNode,
   useCallback,

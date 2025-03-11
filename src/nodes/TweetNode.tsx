@@ -24,7 +24,6 @@ import {
   DecoratorBlockNode,
   SerializedDecoratorBlockNode,
 } from '@lexical/react/LexicalDecoratorBlockNode';
-import * as React from 'react';
 import {useCallback, useEffect, useRef, useState} from 'react';
 
 const WIDGET_SCRIPT_URL = 'https://platform.twitter.com/widgets.js';
@@ -197,6 +196,7 @@ export class TweetNode extends DecoratorBlockNode {
       base: embedBlockTheme.base || '',
       focus: embedBlockTheme.focus || '',
     };
+    console.log('is editor', !!editor);
     return (
       <TweetComponent
         className={className}

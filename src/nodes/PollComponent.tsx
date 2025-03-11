@@ -26,7 +26,6 @@ import {
   KEY_DELETE_COMMAND,
   NodeKey,
 } from 'lexical';
-import * as React from 'react';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import Button from '../ui/Button';
@@ -74,7 +73,7 @@ function PollOptionComponent({
           ref={checkboxRef}
           className="PollNode__optionCheckbox"
           type="checkbox"
-          onChange={(e) => {
+          onChange={() => {
             withPollNode((node) => {
               node.toggleVote(option, clientID);
             });
