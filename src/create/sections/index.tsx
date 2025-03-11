@@ -1,6 +1,6 @@
 'use client';
 
-// import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -11,7 +11,6 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
-import { useSettings } from '@/context/SettingsContext';
 
 // Import necessary nodes
 import { ListNode, ListItemNode } from '@lexical/list';
@@ -26,9 +25,6 @@ import Toolbar from './components/toolbar';
 import { theme } from './components/theme';
 import ImagesPlugin from '@/plugins/ImagesPlugin';
 // import InlineImagePlugin from '@/plugins/InlineImagePlugin';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-// import { useEditorStore } from '@/store';
-// import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 
 export interface EditorProps {
   initialConfig?: any;
@@ -55,6 +51,29 @@ const defaultConfig = {
   ],
 };
 
+const ErrorBoundary = ({ children }: { children: React.ReactNode }) => {
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      console.error('Error in RichTextPlugin:', event.error);
+      setHasError(true);
+    };
+
+    // Add a global error handler for the editor
+    window.addEventListener('error', handleError);
+    return () => {
+      window.removeEventListener('error', handleError);
+    };
+  }, []);
+
+  if (hasError) {
+    return <div>An error occurred while rendering the content.</div>;
+  }
+
+  return <>{children}</>;
+};
+
 const Editor = ({ initialConfig = defaultConfig, onChange }: EditorProps) => {
   return (
     <LexicalComposer initialConfig={initialConfig}>
@@ -64,36 +83,6 @@ const Editor = ({ initialConfig = defaultConfig, onChange }: EditorProps) => {
 };
 
 const EditorComponent = ({ onChange }: EditorProps) => {
-  const [editor] = useLexicalComposerContext();
-
-  const {
-    settings: {
-      // isCollab,
-      // isAutocomplete,
-      // isMaxLength,
-      // isCharLimit,
-      // hasLinkAttributes,
-      // isCharLimitUtf8,
-      isRichText,
-      // showTreeView,
-      // showTableOfContents,
-      // shouldUseLexicalContextMenu,
-      // shouldPreserveNewLinesInMarkdown,
-      // tableCellMerge,
-      // tableCellBackgroundColor,
-      // tableHorizontalScroll,
-      // shouldAllowHighlightingWithBrackets,
-      // selectionAlwaysOnDisplay,
-    },
-  } = useSettings();
-
-  // useEffect(() => {
-  //   console.log(
-  //     'Editor nodes:',
-  //     editor.getEditorState().read(() => editor._nodes)
-  //   );
-  // }, [editor]);
-
   const handleChange = (editorState: any) => {
     editorState.read(() => {
       if (onChange) {
@@ -115,19 +104,19 @@ const EditorComponent = ({ onChange }: EditorProps) => {
             placeholder={
               <span className="absolute left-4 top-4">Start writing...</span>
             }
-            ErrorBoundary={(error) => <div>Error: {error.children}</div>}
+            ErrorBoundary={ErrorBoundary}
           />
           <HistoryPlugin />
           <AutoFocusPlugin />
           <ListPlugin />
           <LinkPlugin />
           <MarkdownShortcutPlugin />
-          {isRichText && (
-            <>
+          {/* {isRichText && (
+            <> */}
               <ImagesPlugin />
               {/* <InlineImagePlugin editor={editor} /> */}
-            </>
-          )}
+            {/* </> */}
+          {/* )} */}
           <OnChangePlugin onChange={handleChange} />
         </div>
       </div>

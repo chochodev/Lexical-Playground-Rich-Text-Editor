@@ -4,10 +4,6 @@ import { useState, useRef } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { UNDO_COMMAND, REDO_COMMAND } from 'lexical';
 import {
-  INSERT_UNORDERED_LIST_COMMAND,
-  INSERT_ORDERED_LIST_COMMAND,
-} from '@lexical/list';
-import {
   FiItalic,
   FiLink,
   FiCode,
@@ -31,34 +27,22 @@ import {
   LuAlignJustify,
   LuQuote,
   LuCode,
+  LuImage,
 } from 'react-icons/lu';
 import { BiParagraph } from 'react-icons/bi';
 import { Button as ToolButton, Separator } from './tool-button';
 import LinkModal from '../link-modal';
-import { Button, Select, SelectItem } from '@heroui/react';
+import { Select, SelectItem } from '@heroui/react';
 import { useToolbarStore } from '@/store';
 import { useLinkHook, useFontFormat } from '@/hooks';
 import { DEFAULT_FONT_SIZE } from '@/lib/utils';
 import { type ToolbarAction } from '@/types/toolbar-type';
 import { ColorPicker } from '../color-picker';
-import { InsertImageDialog } from '@/plugins/ImagesPlugin';
-import useModal from '@/hooks/useModal';
+import ImageModal from '../image-modal';
 
 const TOOLBAR_ACTIONS: ToolbarAction[] = [
   { icon: <FiItalic />, command: 'italic', type: 'text', label: 'Italic' },
   { icon: <FiCode />, command: 'code', type: 'text', label: 'Code' },
-  {
-    icon: <LuList />,
-    command: INSERT_UNORDERED_LIST_COMMAND,
-    type: 'list',
-    label: 'Bullet List',
-  },
-  {
-    icon: <LuListOrdered />,
-    command: INSERT_ORDERED_LIST_COMMAND,
-    type: 'list',
-    label: 'Numbered List',
-  },
   {
     icon: <FiLink />,
     command: 'insertLink',
@@ -67,61 +51,62 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
   },
 ];
 
-export const TEXT_FORMAT_OPTIONS = [
-  {
-    key: 'root',
-    label: 'None',
-    icon: <LuPlus className="text-[1.25rem]" />,
-    shortcut: '',
-  },
+const TEXT_FORMAT_OPTIONS = [
   {
     key: 'paragraph',
     label: 'Paragraph',
-    icon: <BiParagraph className="text-[1.5rem]" />,
+    icon: BiParagraph,
     shortcut: 'Ctrl+Alt+0',
   },
   {
     key: 'h1',
     label: 'Heading 1',
-    icon: <LuHeading1 className="text-[1.5rem]" />,
+    icon: LuHeading1,
     shortcut: 'Ctrl+Alt+1',
   },
   {
     key: 'h2',
     label: 'Heading 2',
-    icon: <LuHeading2 className="text-[1.5rem]" />,
+    icon: LuHeading2,
     shortcut: 'Ctrl+Alt+2',
   },
   {
     key: 'h3',
     label: 'Heading 3',
-    icon: <LuHeading3 className="text-[1.5rem]" />,
+    icon: LuHeading3,
     shortcut: 'Ctrl+Alt+3',
   },
   {
     key: 'bullet',
     label: 'Bullet List',
-    icon: <LuList className="text-[1.25rem]" />,
+    icon: LuList,
     shortcut: 'Ctrl+Alt+4',
   },
   {
     key: 'number',
-    label: 'Numbered List',
-    icon: <LuListOrdered className="text-[1.25rem]" />,
+    label: 'Number List',
+    icon: LuListOrdered,
     shortcut: 'Ctrl+Alt+5',
   },
   {
     key: 'quote',
     label: 'Quote',
-    icon: <LuQuote className="text-[1.25rem]" />,
+    icon: LuQuote,
     shortcut: 'Ctrl+Alt+Q',
   },
   {
     key: 'code',
     label: 'Code Block',
-    icon: <LuCode className="text-[1.25rem]" />,
+    icon: LuCode,
     shortcut: 'Ctrl+Alt+C',
   },
+];
+
+const TEXT_ALIGN_FORMATS = [
+  { key: 'left', icon: LuAlignLeft, label: 'Left' },
+  { key: 'center', icon: LuAlignCenter, label: 'Center' },
+  { key: 'right', icon: LuAlignRight, label: 'Right' },
+  { key: 'justify', icon: LuAlignJustify, label: 'Justify' },
 ];
 
 const FONT_FAMILY_OPTIONS: [string, string][] = [
@@ -147,6 +132,7 @@ const FONT_WEIGHTS = [
 const Toolbar = () => {
   const [editor] = useLexicalComposerContext();
   const [linkUrl, setLinkUrl] = useState('');
+  const [showImageModal, setShowImageModal] = useState(true);
   const {
     setShowInsertLinkModal,
     textProperties,
@@ -180,30 +166,26 @@ const Toolbar = () => {
   } = useFontFormat();
   useFontFormat();
 
-  const [modal, showModal] = useModal();
-
   return (
     <div className="relative flex flex-wrap gap-2 rounded-md bg-gray-50 p-2">
-      <Button
-        onPress={() => {
-          showModal('Insert Image', (onClose) => (
-            <InsertImageDialog activeEditor={editor} onClose={onClose} />
-          ));
-        }}
-        className="item"
-      >
-        <i className="icon image" />
-        <span className="text">Image</span>
-      </Button>
+      {/* Undo & Redo Buttons */}
+      <ToolButton
+        icon={<FiRotateCcw />}
+        onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
+        label={'Undo'}
+      />
+      <ToolButton
+        icon={<FiRotateCw />}
+        onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
+        label={'Redo'}
+      />
+
+      {/* ::::::::::::::::::::::: Separator */}
+      <Separator />
 
       <ToolButton
         icon={<LuBold />}
         onClick={() => {
-          console.log(
-            'font weight: ',
-            textProperties.fontWeight,
-            typeof textProperties.fontWeight
-          );
           setFontWeight(textProperties.fontWeight === '600' ? 'normal' : '600');
         }}
         label="Bold"
@@ -219,6 +201,51 @@ const Toolbar = () => {
           </ToolButton>
         </div>
       ))}
+
+      <ToolButton
+        icon={<LuImage />}
+        onClick={() => {
+          setShowImageModal(true);
+        }}
+        label="Insert Image"
+      />
+      {/* ::::::::::::::::::::::: Separator */}
+      <Separator />
+
+      {/* :::::::::::::::::::::::: Font Size Control */}
+      <ToolButton
+        icon={<LuMinus />}
+        onClick={() => changeFontSize(false)}
+        label={'Decrease Size'}
+      />
+
+      <input
+        type="text"
+        className="w-8 h-7 my-auto text-sm rounded-md border border-solid border-gray-200 text-center"
+        placeholder={`${DEFAULT_FONT_SIZE}`}
+        value={`${textProperties.fontSize}`}
+        disabled
+      />
+
+      <ToolButton
+        icon={<LuPlus />}
+        onClick={() => changeFontSize(true)}
+        label={'Increase Size'}
+      />
+
+      {/* ::::::::::::::::::::::: Color Picker */}
+      <ColorPicker
+        type="text"
+        label="Text Color"
+        onChange={(value) => setTextColor(value)}
+      />
+      <ColorPicker
+        type="background"
+        label="Background Color"
+        onChange={(value) => setBackgroundColor(value)}
+      />
+
+      {/* insert image, list, font family */}
 
       {/* ::::::::::::::::::::::: Separator */}
       <Separator />
@@ -260,31 +287,24 @@ const Toolbar = () => {
         }
         selectorIcon={<LuChevronsUpDown />}
       >
+        <>
+          {TEXT_FORMAT_OPTIONS.map((option) => (
+            <SelectItem
+              key={option.key}
+              style={{ display: 'hidden' }}
+              textValue={option.label}
+            >
+              <div className="flex gap-2 items-center w-full">
+                <option.icon className="text-[1.25rem]" />{' '}
+                <span className="text-sm w-max">{option.label}</span>
+              </div>
+            </SelectItem>
+          ))}
+        </>
         <SelectItem key="root" style={{ display: 'hidden' }} textValue="Root">
           <div className="flex gap-2 items-center w-full">
-            <LuHeading3 className="text-[1.5rem]" /> <span>Root</span>
-          </div>
-        </SelectItem>
-        <SelectItem key="paragraph" textValue="Paragraph">
-          <div className="flex gap-2 items-center w-full">
-            <BiParagraph className="text-[1.5rem]" />
-            <span>Paragraph</span>
-          </div>
-        </SelectItem>
-        <SelectItem key="h1" textValue="H1">
-          <div className="flex gap-2 items-center w-full">
-            <LuHeading1 className="text-[1.5rem]" />
-            <span>Heading 1</span>
-          </div>
-        </SelectItem>
-        <SelectItem key="h2" textValue="H2">
-          <div className="flex gap-2 items-center w-full">
-            <LuHeading2 className="text-[1.5rem]" /> <span>Heading 2</span>
-          </div>
-        </SelectItem>
-        <SelectItem key="h3" textValue="H3">
-          <div className="flex gap-2 items-center w-full">
-            <LuHeading3 className="text-[1.5rem]" /> <span>Heading 3</span>
+            <LuPlus className="text-[1.25rem]" />{' '}
+            <span className="text-sm w-max">Root</span>
           </div>
         </SelectItem>
       </Select>
@@ -368,84 +388,19 @@ const Toolbar = () => {
         }
         selectorIcon={<LuChevronsUpDown />}
       >
-        <SelectItem key="left" textValue="Left">
-          <div className="flex gap-2 items-center w-full">
-            <LuAlignLeft className="text-[1.25rem]" />
-            <span className="text-xsm font-[600]">Align Left</span>
-          </div>
-        </SelectItem>
-        <SelectItem key="center" textValue="Center">
-          <div className="flex gap-2 items-center w-full">
-            <LuAlignCenter className="text-[1.25rem]" />
-            <span className="text-xsm font-[600]">Align Center</span>
-          </div>
-        </SelectItem>
-        <SelectItem key="right" textValue="Right">
-          <div className="flex gap-2 items-center w-full">
-            <LuAlignRight className="text-[1.25rem]" />
-            <span className="text-xsm font-[600]">Align Right</span>
-          </div>
-        </SelectItem>
-        <SelectItem key="justify" textValue="Justify">
-          <div className="flex gap-2 items-center w-full">
-            <LuAlignJustify className="text-[1.25rem]" />
-            <span className="text-xsm font-[600]">Align Justify</span>
-          </div>
-        </SelectItem>
+        <>
+          {TEXT_ALIGN_FORMATS.map((option) => (
+            <SelectItem key={option.key} textValue={option.label}>
+              <div className="flex gap-2 items-center w-full">
+                <option.icon className="text-[1.25rem]" />
+                <span className="text-xsm font-[600]">
+                  Align {option.label}
+                </span>
+              </div>
+            </SelectItem>
+          ))}
+        </>
       </Select>
-
-      {/* ::::::::::::::::::::::: Separator */}
-      <Separator />
-
-      {/* :::::::::::::::::::::::: Font Size Control */}
-      <ToolButton
-        icon={<LuMinus />}
-        onClick={() => changeFontSize(false)}
-        label={'Decrease Size'}
-      />
-
-      <input
-        type="text"
-        className="w-8 h-7 my-auto text-sm rounded-md border border-solid border-gray-200 text-center"
-        placeholder={`${DEFAULT_FONT_SIZE}`}
-        value={`${textProperties.fontSize}`}
-        disabled
-      />
-
-      <ToolButton
-        icon={<LuPlus />}
-        onClick={() => changeFontSize(true)}
-        label={'Increase Size'}
-      />
-
-      {/* ::::::::::::::::::::::: Color Picker */}
-      <ColorPicker
-        type="text"
-        label="Text Color"
-        onChange={(value) => setTextColor(value)}
-      />
-      <ColorPicker
-        type="background"
-        label="Background Color"
-        onChange={(value) => setBackgroundColor(value)}
-      />
-
-      {/* insert image, list, font family */}
-
-      {/* ::::::::::::::::::::::: Separator */}
-      <Separator />
-
-      {/* Undo & Redo Buttons */}
-      <ToolButton
-        icon={<FiRotateCcw />}
-        onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
-        label={'Undo'}
-      />
-      <ToolButton
-        icon={<FiRotateCw />}
-        onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
-        label={'Redo'}
-      />
 
       {hoveredLink && (
         <button
@@ -470,7 +425,11 @@ const Toolbar = () => {
         unlinkText={unlinkText}
       />
 
-      {modal}
+      <ImageModal
+        isOpen={showImageModal}
+        editor={editor}
+        setIsOpen={setShowImageModal}
+      />
     </div>
   );
 };
