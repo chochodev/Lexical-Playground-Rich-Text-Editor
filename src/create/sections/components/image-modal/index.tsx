@@ -8,7 +8,7 @@ import {
   Input,
 } from '@heroui/react';
 import { AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FileInput from '@/ui/file-input';
 import {
   INSERT_IMAGE_COMMAND,
@@ -19,7 +19,7 @@ export default function ImageModal({ isOpen, setIsOpen, editor }) {
   const [mode, setMode] = useState<null | 'url' | 'file'>(null);
   const [src, setSrc] = useState('');
   const [altText, setAltText] = useState('');
-  
+
   const loadImage = (files: FileList | null) => {
     const reader = new FileReader();
     reader.onload = function () {
@@ -36,7 +36,14 @@ export default function ImageModal({ isOpen, setIsOpen, editor }) {
   const handleOnClick = (payload: InsertImagePayload) => {
     editor.dispatchCommand(INSERT_IMAGE_COMMAND, payload);
     setIsOpen(false);
+    setMode(null);
+    setSrc('');
+    setAltText('');
   };
+
+  useEffect(() => {
+    if (mode && !isOpen) setMode(null);
+  }, [mode, isOpen]);
 
   return (
     <AnimatePresence>
@@ -90,7 +97,29 @@ export default function ImageModal({ isOpen, setIsOpen, editor }) {
                 </div>
               </div>
             ) : (
-              <></>
+              <div className="w-full space-y-2">
+                <div className="flex items-center justify-between w-full gap-2 ">
+                  <label className="text-sm w-max">Enter URL: </label>
+                  <Input
+                    placeholder="e.g. Ilemobade Library, FUTA"
+                    onChange={(e) => setSrc(e.target.value)}
+                    value={src}
+                    radius="sm"
+                    className="w-[73%]"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between w-full gap-2 ">
+                  <label className="text-sm w-max">Alt Text: </label>
+                  <Input
+                    placeholder="Random unsplash image"
+                    onChange={(e) => setAltText(e.target.value)}
+                    value={altText}
+                    radius="sm"
+                    className="w-[73%]"
+                  />
+                </div>
+              </div>
             )}
           </ModalBody>
           <ModalFooter>
